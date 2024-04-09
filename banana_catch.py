@@ -3,13 +3,19 @@ import random as rand
 from sprites.basket import Basket
 from sprites.banana import Banana
 import config as cfg
+import utils as u
 
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 640
-
-
-BANANA_SIZE = (64, 32)
-BANANA_INIT_FALL_SPEED = 5
+def setup_screen():
+    # screen
+    screen = pg.display.set_mode((cfg.SCREEN_WIDTH, cfg.SCREEN_HEIGHT))
+    pg.display.set_caption(cfg.SCREEN_CAPTION)
+    # mouse
+    pg.mouse.set_visible(False)
+    # background
+    background = pg.Surface(screen.get_size())
+    background = background.convert()
+    background.fill(pg.Color("chartreuse4"))
+    return screen, background
 
 
 def main():
@@ -17,37 +23,23 @@ def main():
 
     ### INITIALIZATION
     pg.init()
-    screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pg.display.set_caption("Bananarama")
-    # make mouse invisible inside window
-    pg.mouse.set_visible(False)
-     
-    # Set background
-    background = pg.Surface(screen.get_size())
-    background = background.convert()
-    background.fill(pg.Color("chartreuse4"))
-
-    # initial display to screen
-    screen.blit(background, (0, 0))
-    pg.display.update()
-
-    # Basket
-    basket = Basket()
+    evgen = u.EventGenerator()
+    screen, background = setup_screen()
 
     # Sprite groups
+    basket = Basket()
     basket_group = pg.sprite.Group(basket)
     bananas = pg.sprite.Group()
+
+    # define events
+    CREATE_BANANA_EVENT = evgen.define_event(2000)
+    SHOW_PLAYER_SCORE = evgen.define_event(2000)
 
     # define a variable to control the main loop
     running = True
 
     clock = pg.time.Clock()
 
-    NEW_BANANA_EVENT = pg.USEREVENT + 1
-    pg.time.set_timer(NEW_BANANA_EVENT, 2000)
-
-    SHOW_PLAYER_SCORE_EVENT = pg.USEREVENT + 2
-    pg.time.set_timer(SHOW_PLAYER_SCORE_EVENT, 1000)
 
     score = 0
 
@@ -58,12 +50,16 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-            elif event.type == NEW_BANANA_EVENT: 
-                start_position = rand.randint(0, int((9/10)*SCREEN_WIDTH))
+            elif event.type == CREATE_BANANA_EVENT: 
+                start_position = rand.randint(0, int((9/10)*cfg.SCREEN_WIDTH))
                 banana = Banana(start_position, cfg.BANANA_SPEED)
                 bananas.add(banana)
-            elif event.type == SHOW_PLAYER_SCORE_EVENT:
+            elif event.type == SHOW_PLAYER_SCORE:
                 print(f"Player score is: {score}")
+
+        ### TEXT
+        
+
 
         ### GAME LOGIC
         for banana in bananas:
