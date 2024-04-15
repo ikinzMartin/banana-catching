@@ -28,7 +28,7 @@ def main():
     screen, background = setup_screen()
 
     # Sprite groups
-    basket = Basket()
+    basket = Basket(speed=5)
     basket_group = pg.sprite.Group(basket)
     bananas = pg.sprite.Group()
     start_button = Button("Start", (1/4)*cfg.SCREEN_WIDTH, (1/2)*cfg.SCREEN_HEIGHT, 100, 50)
@@ -96,6 +96,12 @@ def main():
                     paused = True
                     pg.mouse.set_visible(True)
                     continue
+                elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT:
+                    basket.move_left()
+                elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT:
+                    basket.move_right()
+                elif event.type == pg.KEYUP and event.key in (pg.K_LEFT, pg.K_RIGHT):
+                    basket.stop()
 
             ### GAME LOGIC
             for banana in bananas:
